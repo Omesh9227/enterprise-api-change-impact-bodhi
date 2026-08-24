@@ -1,0 +1,4 @@
+{"screens":[
+{"application":"customer-portal","screen":"Checkout","route":"/checkout","api_operations":["createOrder"],"evidence_source":"frontend-code-scan","confidence":0.95},
+{"application":"store-portal","screen":"Create Order","route":"/orders/new","api_operations":["createOrder"],"evidence_source":"manual-catalog","confidence":1.0}
+]}

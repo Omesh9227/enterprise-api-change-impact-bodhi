@@ -1,0 +1,34 @@
+openapi: 3.0.3
+info: {title: Orders API, version: 2.0.0}
+paths:
+  /orders:
+    post:
+      operationId: createOrder
+      security: [{oauth2: [orders.write]}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/CreateOrderRequest'}
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/OrderResponse'}
+        '422': {description: Validation failed}
+components:
+  schemas:
+    CreateOrderRequest:
+      type: object
+      required: [customerId, items]
+      properties:
+        customerId: {type: string}
+        channel: {type: string, enum: [WEB, STORE, MOBILE]}
+        items: {type: array}
+        promotionCode: {type: string}
+    OrderResponse:
+      type: object
+      properties:
+        orderId: {type: string}
+        status: {type: string, enum: [CREATED, CONFIRMED, REJECTED]}

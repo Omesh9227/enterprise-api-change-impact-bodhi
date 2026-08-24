@@ -1,0 +1,6 @@
+{"dependencies":[
+{"consumer":"payment-service","provider":"orders-service","operation_id":"createOrder","evidence_source":"service-catalog","confidence":1.0},
+{"consumer":"inventory-service","provider":"orders-service","operation_id":"createOrder","evidence_source":"distributed-trace","confidence":0.92},
+{"consumer":"shipment-service","provider":"payment-service","operation_id":"capturePayment","evidence_source":"source-code","confidence":0.90},
+{"consumer":"notification-service","provider":"shipment-service","operation_id":"createShipment","evidence_source":"service-catalog","confidence":0.95}
+]}

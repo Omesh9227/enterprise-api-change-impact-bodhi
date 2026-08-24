@@ -1,0 +1,7 @@
+services:
+  api-impact-mcp:
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: 8000

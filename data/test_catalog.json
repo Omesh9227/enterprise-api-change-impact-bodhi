@@ -1,0 +1,6 @@
+{"tests":[
+{"test_id":"TC-ORD-001","name":"Create order contract test","service":"orders-service","covers_operations":["createOrder"],"covers_screens":[],"tags":["critical","contract"],"average_duration_seconds":20,"business_criticality":5},
+{"test_id":"TC-PAY-010","name":"Payment after order creation","service":"payment-service","covers_operations":["createOrder","capturePayment"],"covers_screens":[],"tags":["critical","payment"],"average_duration_seconds":75,"business_criticality":5},
+{"test_id":"TC-WEB-101","name":"Customer checkout end-to-end","service":"customer-portal","covers_operations":["createOrder"],"covers_screens":["customer-portal > Checkout"],"tags":["critical","checkout"],"average_duration_seconds":130,"business_criticality":5},
+{"test_id":"TC-STORE-102","name":"Store associate creates order","service":"store-portal","covers_operations":["createOrder"],"covers_screens":["store-portal > Create Order"],"tags":["store"],"average_duration_seconds":110,"business_criticality":4}
+]}
