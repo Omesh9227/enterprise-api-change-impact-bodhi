@@ -12,11 +12,55 @@ HTTP_METHODS = {'get','post','put','patch','delete','head','options','trace'}
 def load_json(name):
     return json.loads((BASE/'data'/name).read_text(encoding='utf-8'))
 
+def repair_double_encoded_json(value):
+    """Best-effort repair for a common MCP-client integration bug: the caller
+    sends a JSON/YAML string that still carries one extra layer of
+    JSON-string escaping (literal backslash-quote sequences like `\\"openapi\\"`
+    instead of real quotes `"openapi"`), typically because an upstream
+    workflow/agent step ran json.dumps() (or equivalent) on the spec text an
+    extra time before handing it to this tool. Detect that pattern and undo
+    exactly one layer of escaping. Returns the repaired string, or None if
+    the value doesn't look like it needs (or can't safely receive) repair.
+    """
+    if not isinstance(value, str) or '\\"' not in value:
+        return None
+    try:
+        repaired = json.loads(f'"{value}"')
+    except (json.JSONDecodeError, ValueError):
+        return None
+    return repaired if isinstance(repaired, str) else None
+
+def _parsed_openapi_doc(value):
+    """Parse a YAML/JSON string and return it only if it looks like a real
+    OpenAPI document (dict with 'openapi' and 'paths'). Returns None on any
+    parse failure or on a successful-but-wrong-shaped parse -- notably,
+    double-encoded JSON often parses "successfully" into a garbage dict of
+    literal backslash-quote keys instead of raising, so a shape check is
+    required in addition to catching exceptions.
+    """
+    try:
+        doc = yaml.safe_load(value)
+    except yaml.YAMLError:
+        return None
+    return doc if isinstance(doc, dict) and 'openapi' in doc and 'paths' in doc else None
+
 def parse_spec(value):
     if isinstance(value, dict):
         doc = deepcopy(value)
     elif isinstance(value, str):
-        doc = yaml.safe_load(value)
+        doc = _parsed_openapi_doc(value)
+        if doc is None:
+            repaired = repair_double_encoded_json(value)
+            if repaired is not None:
+                doc = _parsed_openapi_doc(repaired)
+        if doc is None:
+            raise ValueError(
+                'Invalid OpenAPI document: openapi and paths are required '
+                '(also tried undoing one layer of JSON-string escaping in case '
+                'this text was double-encoded by an intermediate agent/expression '
+                'step; if it still fails, check whether the text was JSON-escaped '
+                'more than once before reaching this tool).'
+            )
     else:
         raise ValueError('OpenAPI input must be a dict or YAML/JSON string')
     if not isinstance(doc, dict) or 'openapi' not in doc or 'paths' not in doc:

@@ -6,7 +6,7 @@ from mcp.client.streamable_http import streamable_http_client
 
 async def main():
     async with streamable_http_client(
-        "http://localhost:8000/mcp"
+        "https://api-change-impact-mcp-gya2wuoicq-uc.a.run.app/mcp"
     ) as (read_stream, write_stream, _):
 
         async with ClientSession(
